@@ -14,14 +14,14 @@ This tutorial assumes the next:
 First get the package
 
 ```
-go get -u github.com/sait/go-conekta
+go get -u github.com/grodriguez85/go-conekta
 ```
 
 Import in your project
 
 ```go
 import (
-    "github.com/sait/go-conekta/conekta"
+    "github.com/grodriguez85/go-conekta/conekta"
 )
 ```
 
