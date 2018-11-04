@@ -1,6 +1,7 @@
 package conekta
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -120,8 +121,8 @@ type PaymentMethod struct {
 }
 
 // Creates a new Order
-func (o *Order) Create() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("POST", "/orders", o)
+func (o *Order) Create(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "POST", "/orders", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -133,8 +134,8 @@ func (o *Order) Create() (statusCode int, conektaError ConektaError, conektaResp
 }
 
 // Updates an existing Order
-func (o *Order) Update() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("PUT", "/orders/"+o.ID, o)
+func (o *Order) Update(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "PUT", "/orders/"+o.ID, o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -146,8 +147,8 @@ func (o *Order) Update() (statusCode int, conektaError ConektaError, conektaResp
 }
 
 // Process a pre-authorized order.
-func (o *Order) Capture() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("POST", "/orders/"+o.ID+"/capture", nil)
+func (o *Order) Capture(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "POST", "/orders/"+o.ID+"/capture", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -159,8 +160,8 @@ func (o *Order) Capture() (statusCode int, conektaError ConektaError, conektaRes
 }
 
 // A Refund details the amount and reason why an order was refunded.
-func (o *Order) Refund() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("POST", "/orders/"+o.ID+"/refunds", o)
+func (o *Order) Refund(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "POST", "/orders/"+o.ID+"/refunds", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)

@@ -1,6 +1,7 @@
 package conekta
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -67,8 +68,8 @@ type Subscription struct {
 	Status            string `json:"status,omitempty"`
 }
 
-func (c *Customer) Create() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("POST", "/customers", c)
+func (c *Customer) Create(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "POST", "/customers", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -79,8 +80,8 @@ func (c *Customer) Create() (statusCode int, conektaError ConektaError, conektaR
 	return
 }
 
-func (c *Customer) Update() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("PUT", "/customers/"+c.CustomerID, c)
+func (c *Customer) Update(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID, c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -91,8 +92,8 @@ func (c *Customer) Update() (statusCode int, conektaError ConektaError, conektaR
 	return
 }
 
-func (c *Customer) Delete() (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request("DELETE", "/customers/"+c.CustomerID, nil)
+func (c *Customer) Delete(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+	statusCode, response := request(ctx, "DELETE", "/customers/"+c.CustomerID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -103,8 +104,8 @@ func (c *Customer) Delete() (statusCode int, conektaError ConektaError, conektaR
 	return
 }
 
-func (c *Customer) CreateSubscription(plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
+func (c *Customer) CreateSubscription(ctx context.Context, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -115,8 +116,8 @@ func (c *Customer) CreateSubscription(plan string) (statusCode int, conektaError
 	return
 }
 
-func (c *Customer) UpdateSubscription(plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request("PUT", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
+func (c *Customer) UpdateSubscription(ctx context.Context, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -127,8 +128,8 @@ func (c *Customer) UpdateSubscription(plan string) (statusCode int, conektaError
 	return
 }
 
-func (c *Customer) PauseSubscription() (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/pause", nil)
+func (c *Customer) PauseSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/pause", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -139,8 +140,8 @@ func (c *Customer) PauseSubscription() (statusCode int, conektaError ConektaErro
 	return
 }
 
-func (c *Customer) ResumeSubscription() (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/resume", nil)
+func (c *Customer) ResumeSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/resume", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -151,8 +152,8 @@ func (c *Customer) ResumeSubscription() (statusCode int, conektaError ConektaErr
 	return
 }
 
-func (c *Customer) CancelSubscription() (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/cancel", nil)
+func (c *Customer) CancelSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/cancel", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -163,8 +164,8 @@ func (c *Customer) CancelSubscription() (statusCode int, conektaError ConektaErr
 	return
 }
 
-func (c *Customer) CreatePaymentSource(paymentSource PaymentSource) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
-	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/payment_sources/", paymentSource)
+func (c *Customer) CreatePaymentSource(ctx context.Context, paymentSource PaymentSource) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
+	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/payment_sources/", paymentSource)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -175,8 +176,8 @@ func (c *Customer) CreatePaymentSource(paymentSource PaymentSource) (statusCode 
 	return
 }
 
-func (c *Customer) DeletePaymentSource(paymentSourceID string) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
-	statusCode, response := request("DELETE", "/customers/"+c.CustomerID+"/payment_sources/"+paymentSourceID, nil)
+func (c *Customer) DeletePaymentSource(ctx context.Context, paymentSourceID string) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
+	statusCode, response := request(ctx, "DELETE", "/customers/"+c.CustomerID+"/payment_sources/"+paymentSourceID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
