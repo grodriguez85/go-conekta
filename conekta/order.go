@@ -5,6 +5,24 @@ import (
 	"encoding/json"
 )
 
+type OrderResponse struct {
+	Livemode        *bool           `json:"livemode,omitempty"`
+	Amount          int64           `json:"amount,omitempty"`
+	Currency        string          `json:"currency,omitempty"`
+	PaymentStatus   string          `json:"payment_status,omitempty"`
+	AmountRefunded  int64           `json:"amount_refunded,omitempty"`
+	CustomerInfo    CustomerInfo    `json:"customer_info,omitempty"`
+	ShippingContact ShippingContact `json:"shipping_contact,omitempty"`
+	Object          string          `json:"object,omitempty"`
+	ID              string          `json:"id,omitempty"`
+	Metadata        Metadata        `json:"metadata,omitempty,omitempty"`
+	CreatedAt       int64           `json:"created_at,omitempty"`
+	UpdatedAt       int64           `json:"updated_at,omitempty"`
+	LineItems       LineItems       `json:"line_items,omitempty"`
+	ShippingLines   ShippingLines   `json:"shipping_lines,omitempty"`
+	Charges         Charges         `json:"charges,omitempty"`
+}
+
 type Order struct {
 	ID              string           `json:"id,omitempty"`
 	Object          string           `json:"object,omitempty"`
@@ -18,39 +36,13 @@ type Order struct {
 	Livemode        *bool            `json:"livemode,omitempty"`
 	PreAuthorize    *bool            `json:"pre_authorize,omitempty"`
 	ShippingContact *ShippingContact `json:"shipping_contact,omitempty"`
-	Amunt           float64          `json:"amount,omitempty"`
+	Amount          float64          `json:"amount,omitempty"`
 	Reason          string           `json:"reason,omitempty"`
 	AmountRefunded  float64          `json:"amount_refunded,omitempty"`
 	PaymentStatus   string           `json:"payment_status,omitempty"`
-	CustomerInfo    Customer         `json:"customer_info,omitempty"`
+	CustomerInfo    CustomerInfo     `json:"customer_info,omitempty"`
 	Charges         []Charge         `json:"charges,omitempty"`
 	Metadata        Metadata         `json:"metadata,omitempty"`
-}
-
-type LineItem struct {
-	ID            string        `json:"id,omitempty"`
-	Object        string        `json:"object,omitempty"`
-	Name          string        `json:"name,omitempty"`
-	Description   string        `json:"description,omitempty"`
-	UnitPrice     int64         `json:"unit_price,omitempty"`
-	Quantity      int64         `json:"quantity,omitempty"`
-	Sku           string        `json:"sku,omitempty"`
-	Tags          Tags          `json:"tags,omitempty"`
-	Brand         string        `json:"brand,omitempty"`
-	ParentID      string        `json:"parent_id,omitempty"`
-	Metadata      Metadata      `json:"metadata,omitempty"`
-	AntifraudInfo AntifraudInfo `json:"antifraud_info,omitempty"`
-}
-
-type ShippingLine struct {
-	ID             string   `json:"id,omitempty"`
-	Object         string   `json:"object,omitempty"`
-	Amount         float64  `json:"amount,omitempty"`
-	TrackingNumber string   `json:"tracking_number,omitempty"`
-	Carrier        string   `json:"carrier,omitempty"`
-	Method         string   `json:"method,omitempty"`
-	ParentID       string   `json:"parent_id,omitempty"`
-	Metadata       Metadata `json:"metadata,omitempty"`
 }
 
 type TaxLine struct {
@@ -75,26 +67,6 @@ type DiscountLine struct {
 type Tags map[string]interface{}
 
 type Metadata map[string]interface{}
-
-type Charge struct {
-	ID                  string        `json:"id,omitempty"`
-	Object              string        `json:"object,omitempty"`
-	Description         string        `json:"description,omitempty"`
-	CreatedAt           int64         `json:"created_at,omitempty"`
-	UpdatedAt           int64         `json:"updated_at,omitempty"`
-	ExpiresAt           int64         `json:"expires_at,omitempty"`
-	Currency            string        `json:"currency,omitempty"`
-	Amount              float64       `json:"amount,omitempty"`
-	MonthlyInstallments float64       `json:"monthly_installments,omitempty"`
-	Livemode            *bool         `json:"livemode,omitempty"`
-	Status              string        `json:"status,omitempty"`
-	Fee                 float64       `json:"fee,omitempty"`
-	OrderID             string        `json:"order_id,omitempty"`
-	CustomerID          string        `json:"customer_id,omitempty"`
-	DeviceFingerprint   string        `json:"device_fingerprint,omitempty"`
-	PaidAt              int64         `json:"paid_at,omitempty"`
-	PaymentMethod       PaymentMethod `json:"payment_method,omitempty"`
-}
 
 type PaymentMethod struct {
 	Type                   string  `json:"type,omitempty"`
@@ -121,52 +93,52 @@ type PaymentMethod struct {
 }
 
 // Creates a new Order
-func (o *Order) Create(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+func (or *OrderResponse) Create(ctx context.Context, o *Order) (statusCode int, conektaError ConektaError) {
 	statusCode, response := request(ctx, "POST", "/orders", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &or)
 		checkError(err)
 	}
 	return
 }
 
 // Updates an existing Order
-func (o *Order) Update(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+func (or *OrderResponse) Update(ctx context.Context, o *Order) (statusCode int, conektaError ConektaError) {
 	statusCode, response := request(ctx, "PUT", "/orders/"+o.ID, o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &or)
 		checkError(err)
 	}
 	return
 }
 
 // Process a pre-authorized order.
-func (o *Order) Capture(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request(ctx, "POST", "/orders/"+o.ID+"/capture", nil)
+func (or *OrderResponse) Capture(ctx context.Context, orderID string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request(ctx, "POST", "/orders/"+orderID+"/capture", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &or)
 		checkError(err)
 	}
 	return
 }
 
 // A Refund details the amount and reason why an order was refunded.
-func (o *Order) Refund(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+func (or *OrderResponse) Refund(ctx context.Context, o *Order) (statusCode int, conektaError ConektaError) {
 	statusCode, response := request(ctx, "POST", "/orders/"+o.ID+"/refunds", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &or)
 		checkError(err)
 	}
 	return

@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"google.golang.org/appengine/log"
 	"google.golang.org/appengine/urlfetch"
 )
 
@@ -28,38 +29,6 @@ type Detail struct {
 
 type body map[string]interface{}
 
-type ConektaResponse struct {
-	Livemode        *bool           `json:"livemode,omitempty"`
-	Amount          int64           `json:"amount,omitempty"`
-	Currency        string          `json:"currency,omitempty"`
-	PaymentStatus   string          `json:"payment_status,omitempty"`
-	AmountRefunded  int64           `json:"amount_refunded,omitempty"`
-	CustomerInfo    CustomerInfo    `json:"customer_info,omitempty"`
-	ShippingContact ShippingContact `json:"shipping_contact,omitempty"`
-	Object          string          `json:"object,omitempty"`
-	ID              string          `json:"id,omitempty"`
-	Metadata        Metadata        `json:"metadata,omitempty,omitempty"`
-	CreatedAt       int64           `json:"created_at,omitempty"`
-	UpdatedAt       int64           `json:"updated_at,omitempty"`
-	LineItems       LineItems       `json:"line_items,omitempty"`
-	ShippingLines   ShippingLines   `json:"shipping_lines,omitempty"`
-	Charges         Charges         `json:"charges,omitempty"`
-}
-
-type Charges struct {
-	Object  string   `json:"object,omitempty"`
-	HasMore *bool    `json:"has_more,omitempty"`
-	Total   int64    `json:"total,omitempty"`
-	Data    []Charge `json:"data,omitempty"`
-}
-
-type ShippingLines struct {
-	Object  string         `json:"object,omitempty"`
-	HasMore *bool          `json:"has_more,omitempty"`
-	Total   int64          `json:"total,omitempty"`
-	Data    []ShippingLine `json:"data,omitempty"`
-}
-
 type CustomerInfo struct {
 	Email      string `json:"email,omitempty"`
 	Phone      string `json:"phone,omitempty"`
@@ -67,13 +36,6 @@ type CustomerInfo struct {
 	Corporate  *bool  `json:"corporate,omitempty"`
 	CustomerID string `json:"customer_id,omitempty"`
 	Object     string `json:"object,omitempty"`
-}
-
-type LineItems struct {
-	Object  string     `json:"object,omitempty"`
-	HasMore *bool      `json:"has_more,omitempty"`
-	Total   int64      `json:"total,omitempty"`
-	Data    []LineItem `json:"data,omitempty"`
 }
 
 type AntifraudInfo map[string]string
@@ -87,13 +49,21 @@ const (
 )
 
 func request(ctx context.Context, method, path string, v interface{}) (statusCode int, response []byte) {
-	jsonPayload, err := json.Marshal(v)
+
+	var payload bytes.Reader
+	if v != nil {
+		jsonPayload, err := json.Marshal(v)
+		if err != nil {
+			return
+		}
+		payload = *bytes.NewReader(jsonPayload)
+	}
+
+	req, err := http.NewRequest(method, conektaURL+path, &payload)
 	if err != nil {
+		log.Infof(ctx, err.Error())
 		return
 	}
-	payload := bytes.NewReader(jsonPayload)
-
-	req, _ := http.NewRequest(method, conektaURL+path, payload)
 	req.Header.Add("accept", "application/vnd.conekta-v"+ApiVersion+"+json")
 	req.SetBasicAuth(ApiKey, "")
 	req.Header.Add("content-type", "application/json")

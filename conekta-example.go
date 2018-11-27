@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/sait/go-conekta/conekta"
+	"github.com/grodriguez85/go-conekta/conekta"
 )
 
 func main() {

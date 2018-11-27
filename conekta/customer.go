@@ -5,8 +5,19 @@ import (
 	"encoding/json"
 )
 
+type CustomerResponse struct {
+	CustomerID               string         `json:"id,omitempty"`
+	Name                     string         `json:"name,omitempty"`
+	Phone                    string         `json:"phone,omitempty"`
+	Email                    string         `json:"email,omitempty"`
+	Corporate                bool           `json:"corporate,omitempty"`
+	DefaultPaymentSourceID   string         `json:"default_payment_source_id,omitempty"`
+	DefaultShippingContactID string         `json:"default_shipping_contact_id,omitempty"`
+	PaymentSources           PaymentSources `json:"payment_sources,omitempty"`
+}
+
 type Customer struct {
-	CustomerID               string            `json:"customer_id,omitempty"`
+	CustomerID               string            `json:"id,omitempty"`
 	Name                     string            `json:"name,omitempty"`
 	Phone                    string            `json:"phone,omitempty"`
 	Email                    string            `json:"email,omitempty"`
@@ -15,20 +26,6 @@ type Customer struct {
 	DefaultShippingContactID string            `json:"default_shipping_contact_id,omitempty"`
 	PaymentSources           []PaymentSource   `json:"payment_sources,omitempty"`
 	ShippingContacts         []ShippingContact `json:"shipping_contacts,omitempty"`
-}
-
-type PaymentSource struct {
-	ID        string `json:"id,omitempty"`
-	Object    string `json:"object,omitempty"`
-	TokenID   string `json:"token_id,omitempty"`
-	Type      string `json:"type,omitempty"`
-	CreatedAt int64  `json:"created_at,omitempty"`
-	Last4     string `json:"last4,omitempty"`
-	Name      string `json:"name,omitempty"`
-	ExpMonth  string `json:"exp_month,omitempty"`
-	ExpYear   string `json:"exp_year,omitempty"`
-	Brand     string `json:"brand,omitempty"`
-	ParentID  string `json:"parent_id,omitempty"`
 }
 
 type ShippingContact struct {
@@ -54,135 +51,49 @@ type Address struct {
 	Object      string `json:"object,omitempty"`
 }
 
-type Subscription struct {
-	ID                string `json:"id,omitempty"`
-	Object            string `json:"object,omitempty"`
-	CreatedAt         int64  `json:"created_at,omitempty"`
-	UpdatedAt         int64  `json:"updated_at,omitempty"`
-	PausedAt          int64  `json:"paused_at,omitempty"`
-	BillingCycleStart int64  `json:"billing_cycle_start,omitempty"`
-	BillingCycleEnd   int64  `json:"billing_cycle_end,omitempty"`
-	TrialStart        int64  `json:"trial_start,omitempty"`
-	TrialEnd          int64  `json:"trial_end,omitempty"`
-	PlanID            string `json:"plan_id,omitempty"`
-	Status            string `json:"status,omitempty"`
+func (cr *CustomerResponse) Find(ctx context.Context, id string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request(ctx, "GET", "/customers/"+id, nil)
+	if statusCode != 200 {
+		err := json.Unmarshal(response, &conektaError)
+		checkError(err)
+	} else {
+		err := json.Unmarshal(response, &cr)
+		checkError(err)
+	}
+	return
 }
 
-func (c *Customer) Create(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+func (cr *CustomerResponse) Create(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError) {
 	statusCode, response := request(ctx, "POST", "/customers", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &cr)
 		checkError(err)
 	}
 	return
 }
 
-func (c *Customer) Update(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
+func (cr *CustomerResponse) Update(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError) {
 	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID, c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
+		err := json.Unmarshal(response, &cr)
 		checkError(err)
 	}
 	return
 }
 
-func (c *Customer) Delete(ctx context.Context) (statusCode int, conektaError ConektaError, conektaResponse ConektaResponse) {
-	statusCode, response := request(ctx, "DELETE", "/customers/"+c.CustomerID, nil)
+func (cr *CustomerResponse) Delete(ctx context.Context, customerID string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request(ctx, "DELETE", "/customers/"+customerID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
 	} else {
-		err := json.Unmarshal(response, &conektaResponse)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) CreateSubscription(ctx context.Context, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &subscription)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) UpdateSubscription(ctx context.Context, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &subscription)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) PauseSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/pause", nil)
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &subscription)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) ResumeSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/resume", nil)
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &subscription)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) CancelSubscription(ctx context.Context) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/cancel", nil)
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &subscription)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) CreatePaymentSource(ctx context.Context, paymentSource PaymentSource) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/payment_sources/", paymentSource)
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &paymentResponse)
-		checkError(err)
-	}
-	return
-}
-
-func (c *Customer) DeletePaymentSource(ctx context.Context, paymentSourceID string) (statusCode int, conektaError ConektaError, paymentResponse PaymentSource) {
-	statusCode, response := request(ctx, "DELETE", "/customers/"+c.CustomerID+"/payment_sources/"+paymentSourceID, nil)
-	if statusCode != 200 {
-		err := json.Unmarshal(response, &conektaError)
-		checkError(err)
-	} else {
-		err := json.Unmarshal(response, &paymentResponse)
+		err := json.Unmarshal(response, &cr)
 		checkError(err)
 	}
 	return

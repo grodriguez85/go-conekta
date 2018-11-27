@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sait/go-conekta/conekta"
+	"github.com/grodriguez85/go-conekta/conekta"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
