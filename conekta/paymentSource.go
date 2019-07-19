@@ -1,7 +1,6 @@
 package conekta
 
 import (
-	"context"
 	"encoding/json"
 )
 
@@ -43,8 +42,8 @@ type PaymentSources struct {
 	Data    []*PaymentSourceResponse `json:"data,omitempty"`
 }
 
-func (ps *PaymentSources) FindPaymentSources(ctx context.Context, customerID string) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "GET", "/customers/"+customerID+"/payment_sources", nil)
+func (ps *PaymentSources) FindPaymentSources(customerID string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("GET", "/customers/"+customerID+"/payment_sources", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -55,8 +54,8 @@ func (ps *PaymentSources) FindPaymentSources(ctx context.Context, customerID str
 	return
 }
 
-func (psr *PaymentSourceResponse) CreatePaymentSource(ctx context.Context, ps *PaymentSource) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "POST", "/customers/"+ps.ParentID+"/payment_sources/", ps)
+func (psr *PaymentSourceResponse) CreatePaymentSource(ps *PaymentSource) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("POST", "/customers/"+ps.ParentID+"/payment_sources/", ps)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -67,8 +66,8 @@ func (psr *PaymentSourceResponse) CreatePaymentSource(ctx context.Context, ps *P
 	return
 }
 
-func (psr *PaymentSourceResponse) DeletePaymentSource(ctx context.Context, customerID string, paymentSourceID string) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "DELETE", "/customers/"+customerID+"/payment_sources/"+paymentSourceID, nil)
+func (psr *PaymentSourceResponse) DeletePaymentSource(customerID string, paymentSourceID string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("DELETE", "/customers/"+customerID+"/payment_sources/"+paymentSourceID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)

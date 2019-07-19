@@ -1,7 +1,6 @@
 package conekta
 
 import (
-	"context"
 	"encoding/json"
 )
 
@@ -51,8 +50,8 @@ type Address struct {
 	Object      string `json:"object,omitempty"`
 }
 
-func (cr *CustomerResponse) Find(ctx context.Context, id string) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "GET", "/customers/"+id, nil)
+func (cr *CustomerResponse) Find(id string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("GET", "/customers/"+id, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -63,8 +62,8 @@ func (cr *CustomerResponse) Find(ctx context.Context, id string) (statusCode int
 	return
 }
 
-func (cr *CustomerResponse) Create(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "POST", "/customers", c)
+func (cr *CustomerResponse) Create(c *Customer) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("POST", "/customers", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -75,8 +74,8 @@ func (cr *CustomerResponse) Create(ctx context.Context, c *Customer) (statusCode
 	return
 }
 
-func (cr *CustomerResponse) Update(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID, c)
+func (cr *CustomerResponse) Update(c *Customer) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("PUT", "/customers/"+c.CustomerID, c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -87,8 +86,8 @@ func (cr *CustomerResponse) Update(ctx context.Context, c *Customer) (statusCode
 	return
 }
 
-func (cr *CustomerResponse) Delete(ctx context.Context, customerID string) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "DELETE", "/customers/"+customerID, nil)
+func (cr *CustomerResponse) Delete(customerID string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("DELETE", "/customers/"+customerID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)

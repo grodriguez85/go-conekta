@@ -1,7 +1,6 @@
 package conekta
 
 import (
-	"context"
 	"encoding/json"
 )
 
@@ -52,8 +51,8 @@ type Charges struct {
 	Data    []ChargeResponse `json:"data,omitempty"`
 }
 
-func (cr *ChargeResponse) CreateCharge(ctx context.Context, c *Charge) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "POST", "/orders/"+c.OrderID+"/charges/", c)
+func (cr *ChargeResponse) CreateCharge(c *Charge) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("POST", "/orders/"+c.OrderID+"/charges/", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)

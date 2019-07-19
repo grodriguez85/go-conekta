@@ -2,16 +2,12 @@ package conekta
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/urlfetch"
 )
 
 type ConektaError struct {
@@ -48,7 +44,7 @@ const (
 	conektaURL = "https://api.conekta.io"
 )
 
-func request(ctx context.Context, method, path string, v interface{}) (statusCode int, response []byte) {
+func request(method, path string, v interface{}) (statusCode int, response []byte) {
 
 	var payload bytes.Reader
 	if v != nil {
@@ -61,15 +57,13 @@ func request(ctx context.Context, method, path string, v interface{}) (statusCod
 
 	req, err := http.NewRequest(method, conektaURL+path, &payload)
 	if err != nil {
-		log.Infof(ctx, err.Error())
 		return
 	}
 	req.Header.Add("accept", "application/vnd.conekta-v"+ApiVersion+"+json")
 	req.SetBasicAuth(ApiKey, "")
 	req.Header.Add("content-type", "application/json")
 
-	client := urlfetch.Client(ctx)
-	res, err := client.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return
 	}

@@ -1,7 +1,6 @@
 package conekta
 
 import (
-	"context"
 	"encoding/json"
 )
 
@@ -33,8 +32,8 @@ type Subscription struct {
 	Status            string `json:"status,omitempty"`
 }
 
-func (sr *SubscriptionResponse) CreateSubscription(ctx context.Context, c *Customer, plan string) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
+func (sr *SubscriptionResponse) CreateSubscription(c *Customer, plan string) (statusCode int, conektaError ConektaError) {
+	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -45,8 +44,8 @@ func (sr *SubscriptionResponse) CreateSubscription(ctx context.Context, c *Custo
 	return
 }
 
-func (sr *SubscriptionResponse) UpdateSubscription(ctx context.Context, c *Customer, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "PUT", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
+func (sr *SubscriptionResponse) UpdateSubscription(c *Customer, plan string) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request("PUT", "/customers/"+c.CustomerID+"/subscription", body{"plan": plan})
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -57,8 +56,8 @@ func (sr *SubscriptionResponse) UpdateSubscription(ctx context.Context, c *Custo
 	return
 }
 
-func (sr *SubscriptionResponse) PauseSubscription(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/pause", nil)
+func (sr *SubscriptionResponse) PauseSubscription(c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/pause", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -69,8 +68,8 @@ func (sr *SubscriptionResponse) PauseSubscription(ctx context.Context, c *Custom
 	return
 }
 
-func (sr *SubscriptionResponse) ResumeSubscription(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/resume", nil)
+func (sr *SubscriptionResponse) ResumeSubscription(c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/resume", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -81,8 +80,8 @@ func (sr *SubscriptionResponse) ResumeSubscription(ctx context.Context, c *Custo
 	return
 }
 
-func (sr *SubscriptionResponse) CancelSubscription(ctx context.Context, c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
-	statusCode, response := request(ctx, "POST", "/customers/"+c.CustomerID+"/subscription/cancel", nil)
+func (sr *SubscriptionResponse) CancelSubscription(c *Customer) (statusCode int, conektaError ConektaError, subscription Subscription) {
+	statusCode, response := request("POST", "/customers/"+c.CustomerID+"/subscription/cancel", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
