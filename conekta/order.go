@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+//OrderResponse orders api response struct
 type OrderResponse struct {
 	Livemode        *bool           `json:"livemode,omitempty"`
 	Amount          int64           `json:"amount,omitempty"`
@@ -22,6 +23,7 @@ type OrderResponse struct {
 	Charges         Charges         `json:"charges,omitempty"`
 }
 
+//Order order struct
 type Order struct {
 	ID              string           `json:"id,omitempty"`
 	Object          string           `json:"object,omitempty"`
@@ -44,6 +46,7 @@ type Order struct {
 	Metadata        Metadata         `json:"metadata,omitempty"`
 }
 
+//TaxLine tax line struct
 type TaxLine struct {
 	ID          string   `json:"id,omitempty"`
 	Object      string   `json:"object,omitempty"`
@@ -53,6 +56,7 @@ type TaxLine struct {
 	Metadata    Metadata `json:"metadata,omitempty"`
 }
 
+//DiscountLine discount line struct
 type DiscountLine struct {
 	ID       string   `json:"id,omitempty"`
 	Object   string   `json:"object,omitempty"`
@@ -63,13 +67,16 @@ type DiscountLine struct {
 	Metadata Metadata `json:"metadata,omitempty"`
 }
 
+//Tags tags struct
 type Tags map[string]interface{}
 
+//Metadata metadata struct
 type Metadata map[string]interface{}
 
+//PaymentMethod payment method struct
 type PaymentMethod struct {
 	Type                   string  `json:"type,omitempty"`
-	TokenId                string  `json:"token_id,omitempty"`
+	TokenID                string  `json:"token_id,omitempty"`
 	PaymentSourceID        string  `json:"payment_source_id,omitempty"`
 	ServiceName            string  `json:"service_name,omitempty"`
 	BarcodeURL             string  `json:"barcode_url,omitempty"`
@@ -91,8 +98,8 @@ type PaymentMethod struct {
 	ReceivingAccountNumber string  `json:"receiving_account_number,omitempty"`
 }
 
-// Creates a new Order
-func (or *OrderResponse) Create(o *Order) (statusCode int, conektaError ConektaError) {
+//Create makes request to create order
+func (or *OrderResponse) Create(o *Order) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/orders", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -104,8 +111,8 @@ func (or *OrderResponse) Create(o *Order) (statusCode int, conektaError ConektaE
 	return
 }
 
-// Updates an existing Order
-func (or *OrderResponse) Update(o *Order) (statusCode int, conektaError ConektaError) {
+//Update makes request to update order
+func (or *OrderResponse) Update(o *Order) (statusCode int, conektaError Error) {
 	statusCode, response := request("PUT", "/orders/"+o.ID, o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -117,8 +124,8 @@ func (or *OrderResponse) Update(o *Order) (statusCode int, conektaError ConektaE
 	return
 }
 
-// Process a pre-authorized order.
-func (or *OrderResponse) Capture(orderID string) (statusCode int, conektaError ConektaError) {
+//Capture makes request to capture a preauthorized order
+func (or *OrderResponse) Capture(orderID string) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/orders/"+orderID+"/capture", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -130,8 +137,8 @@ func (or *OrderResponse) Capture(orderID string) (statusCode int, conektaError C
 	return
 }
 
-// A Refund details the amount and reason why an order was refunded.
-func (or *OrderResponse) Refund(o *Order) (statusCode int, conektaError ConektaError) {
+//Refund makes request to refund order
+func (or *OrderResponse) Refund(o *Order) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/orders/"+o.ID+"/refunds", o)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)

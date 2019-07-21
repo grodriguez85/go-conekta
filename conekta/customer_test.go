@@ -19,7 +19,7 @@ func TestCustomer(t *testing.T) {
 // https://developers.conekta.com/resources/testing
 var _ = Describe("Creating customer", func() {
 	//Testing key
-	conekta.ApiKey = os.Getenv("CONEKTAKEY")
+	conekta.APIKey = os.Getenv("CONEKTAKEY")
 	var cusid, paysrc string
 	Context("Post customer", func() {
 		//New customer

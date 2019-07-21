@@ -8,7 +8,7 @@ import (
 
 func main() {
 	fmt.Println("Hello conekta")
-	conekta.ApiKey = "<My Secret ApiKey>"
+	conekta.APIKey = "<My Secret APIKey>"
 	fmt.Println("Creating an order")
 	order := new(conekta.Order)
 	fmt.Println("Creating an item")

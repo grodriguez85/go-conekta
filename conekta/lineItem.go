@@ -1,5 +1,6 @@
 package conekta
 
+//LineItem line item struct
 type LineItem struct {
 	ID            string        `json:"id,omitempty"`
 	Object        string        `json:"object,omitempty"`
@@ -15,6 +16,7 @@ type LineItem struct {
 	AntifraudInfo AntifraudInfo `json:"antifraud_info,omitempty"`
 }
 
+//LineItems line items struct
 type LineItems struct {
 	Object  string     `json:"object,omitempty"`
 	HasMore *bool      `json:"has_more,omitempty"`

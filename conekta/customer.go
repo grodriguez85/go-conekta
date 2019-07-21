@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 )
 
+//CustomerResponse customers api response struct
 type CustomerResponse struct {
-	CustomerID               string         `json:"id,omitempty"`
+	ID               string         `json:"id,omitempty"`
 	Name                     string         `json:"name,omitempty"`
 	Phone                    string         `json:"phone,omitempty"`
 	Email                    string         `json:"email,omitempty"`
@@ -15,8 +16,9 @@ type CustomerResponse struct {
 	PaymentSources           PaymentSources `json:"payment_sources,omitempty"`
 }
 
+//Customer customer struct
 type Customer struct {
-	CustomerID               string            `json:"id,omitempty"`
+	ID               string            `json:"id,omitempty"`
 	Name                     string            `json:"name,omitempty"`
 	Phone                    string            `json:"phone,omitempty"`
 	Email                    string            `json:"email,omitempty"`
@@ -27,6 +29,7 @@ type Customer struct {
 	ShippingContacts         []ShippingContact `json:"shipping_contacts,omitempty"`
 }
 
+//ShippingContact shipping contact struct
 type ShippingContact struct {
 	ID             string   `json:"id,omitempty"`
 	Object         string   `json:"object,omitempty"`
@@ -39,6 +42,7 @@ type ShippingContact struct {
 	Metadata       Metadata `json:"metadata,omitempty"`
 }
 
+//Address address struct
 type Address struct {
 	Street1     string `json:"street1,omitempty"`
 	Street2     string `json:"street2,omitempty"`
@@ -50,7 +54,8 @@ type Address struct {
 	Object      string `json:"object,omitempty"`
 }
 
-func (cr *CustomerResponse) Find(id string) (statusCode int, conektaError ConektaError) {
+//Find gets a customer by id
+func (cr *CustomerResponse) Find(id string) (statusCode int, conektaError Error) {
 	statusCode, response := request("GET", "/customers/"+id, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -62,7 +67,8 @@ func (cr *CustomerResponse) Find(id string) (statusCode int, conektaError Conekt
 	return
 }
 
-func (cr *CustomerResponse) Create(c *Customer) (statusCode int, conektaError ConektaError) {
+//Create makes request to create customer
+func (cr *CustomerResponse) Create(c *Customer) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/customers", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -74,8 +80,9 @@ func (cr *CustomerResponse) Create(c *Customer) (statusCode int, conektaError Co
 	return
 }
 
-func (cr *CustomerResponse) Update(c *Customer) (statusCode int, conektaError ConektaError) {
-	statusCode, response := request("PUT", "/customers/"+c.CustomerID, c)
+//Update makes request to update customer
+func (cr *CustomerResponse) Update(c *Customer) (statusCode int, conektaError Error) {
+	statusCode, response := request("PUT", "/customers/"+c.ID, c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -86,7 +93,8 @@ func (cr *CustomerResponse) Update(c *Customer) (statusCode int, conektaError Co
 	return
 }
 
-func (cr *CustomerResponse) Delete(customerID string) (statusCode int, conektaError ConektaError) {
+//Delete makes request to delete customer
+func (cr *CustomerResponse) Delete(customerID string) (statusCode int, conektaError Error) {
 	statusCode, response := request("DELETE", "/customers/"+customerID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)

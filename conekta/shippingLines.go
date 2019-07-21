@@ -1,5 +1,6 @@
 package conekta
 
+//ShippingLine shipping line struct
 type ShippingLine struct {
 	ID             string   `json:"id,omitempty"`
 	Object         string   `json:"object,omitempty"`
@@ -11,6 +12,7 @@ type ShippingLine struct {
 	Metadata       Metadata `json:"metadata,omitempty"`
 }
 
+//ShippingLines shipping lines struct
 type ShippingLines struct {
 	Object  string         `json:"object,omitempty"`
 	HasMore *bool          `json:"has_more,omitempty"`

@@ -10,21 +10,24 @@ import (
 	"strings"
 )
 
-type ConektaError struct {
+//Error error response struct
+type Error struct {
 	Object  string   `json:"object,omitempty"`
 	Type    string   `json:"type,omitempty"`
-	LogId   string   `json:"log_id,omitempty"`
+	LogID   string   `json:"log_id,omitempty"`
 	Details []Detail `json:"details,omitempty"`
 }
 
+//Detail detail struct
 type Detail struct {
-	Debug_message string `json:"debug_message,omitempty"`
-	Message       string `json:"message,omitempty"`
-	Code          string `json:"code,omitempty"`
+	DebugMessage string `json:"debug_message,omitempty"`
+	Message      string `json:"message,omitempty"`
+	Code         string `json:"code,omitempty"`
 }
 
 type body map[string]interface{}
 
+//CustomerInfo customer info struct
 type CustomerInfo struct {
 	Email      string `json:"email,omitempty"`
 	Phone      string `json:"phone,omitempty"`
@@ -34,10 +37,14 @@ type CustomerInfo struct {
 	Object     string `json:"object,omitempty"`
 }
 
+//AntifraudInfo anti fraud info struct
 type AntifraudInfo map[string]string
 
 var (
-	ApiKey, ApiVersion = "", "2.0.0"
+	//APIKey Conekta's private key
+	APIKey = ""
+	//APIVersion Conekta's api version
+	APIVersion = "2.0.0"
 )
 
 const (
@@ -59,8 +66,8 @@ func request(method, path string, v interface{}) (statusCode int, response []byt
 	if err != nil {
 		return
 	}
-	req.Header.Add("accept", "application/vnd.conekta-v"+ApiVersion+"+json")
-	req.SetBasicAuth(ApiKey, "")
+	req.Header.Add("accept", "application/vnd.conekta-v"+APIVersion+"+json")
+	req.SetBasicAuth(APIKey, "")
 	req.Header.Add("content-type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)
@@ -78,13 +85,15 @@ func checkError(err error) {
 	}
 }
 
-func ConektaFormatAmount(value float64) (formatted int64, err error) {
+//FormatAmount formats a float to cents amount
+func FormatAmount(value float64) (formatted int64, err error) {
 	strnum := fmt.Sprintf("%.2f", value)
 	strnum = strings.Replace(strnum, ".", "", -1)
 	formatted, err = strconv.ParseInt(strnum, 10, 64)
 	return
 }
 
-func ConektaFormatToFloat64(conektaFormatted int64) float64 {
+//FormatToFloat64 formats an amount in cents to float
+func FormatToFloat64(conektaFormatted int64) float64 {
 	return float64(conektaFormatted) / 100
 }

@@ -28,7 +28,7 @@ import (
 ### Simple Order Example
 
 ```go
-conekta.ApiKey = "<My Secret ApiKey>"
+conekta.APIKey = "<My Secret APIKey>"
 order := new(conekta.Order)
 item := conekta.LineItem{
     Name:        "Awesome item",

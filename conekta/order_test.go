@@ -17,7 +17,7 @@ func TestOrder(t *testing.T) {
 
 var _ = Describe("Handle order", func() {
 	//Testing key
-	conekta.ApiKey = os.Getenv("CONEKTAKEY")
+	conekta.APIKey = os.Getenv("CONEKTAKEY")
 	var oid string
 	Context("Create order to a customer", func() {
 		It("Should response 200", func() {
@@ -56,7 +56,8 @@ var _ = Describe("Handle order", func() {
 				},
 			}
 			order.Charges = append(order.Charges, charge)
-			statusCode, _, _ := order.Create()
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Create(order)
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
@@ -79,15 +80,16 @@ var _ = Describe("Handle order", func() {
 			charge := conekta.Charge{
 				PaymentMethod: conekta.PaymentMethod{
 					Type:    "card",
-					TokenId: "tok_test_visa_4242",
+					TokenID: "tok_test_visa_4242",
 				},
 			}
 			order.Charges = append(order.Charges, charge)
 			order.CustomerInfo.Name = "Fulanito Pérez"
 			order.CustomerInfo.Email = "fulanito@conekta.com"
 			order.CustomerInfo.Phone = "+52181818181"
-			statusCode, _, response := order.Create()
-			oid = response.ID
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Create(order)
+			oid = orderResponse.ID
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
@@ -96,15 +98,15 @@ var _ = Describe("Handle order", func() {
 			order := new(conekta.Order)
 			order.ID = "ord_2iGHf3etsiNEji8Ry"
 			order.Currency = "MXN"
-			statusCode, _, _ := order.Update()
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Update(order)
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
 	Context("Capture order", func() {
 		It("Should response 200", func() {
-			order := new(conekta.Order)
-			order.ID = "ord_2iGPs5fX4uTnqhCJX"
-			statusCode, _, _ := order.Capture()
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Capture("ord_2iGPs5fX4uTnqhCJX")
 			//A preauthorized order can captured only once
 			Expect(statusCode).Should(Equal(428))
 		})
@@ -114,8 +116,9 @@ var _ = Describe("Handle order", func() {
 			order := new(conekta.Order)
 			order.ID = oid
 			order.Reason = "requested_by_client"
-			order.Amunt = 100
-			statusCode, _, _ := order.Refund()
+			order.Amount = 100
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Refund(order)
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
@@ -134,7 +137,7 @@ var _ = Describe("Handle order", func() {
 			charge := conekta.Charge{
 				PaymentMethod: conekta.PaymentMethod{
 					Type:    "card",
-					TokenId: "tok_test_visa_4242",
+					TokenID: "tok_test_visa_4242",
 				},
 			}
 			order.Charges = append(order.Charges, charge)
@@ -147,8 +150,9 @@ var _ = Describe("Handle order", func() {
 			order.CustomerInfo.Name = "Fulanito Pérez"
 			order.CustomerInfo.Email = "fulanito@conekta.com"
 			order.CustomerInfo.Phone = "+52181818181"
-			statusCode, _, response := order.Create()
-			oid = response.ID
+			orderResponse := new(conekta.OrderResponse)
+			statusCode, _ := orderResponse.Create(order)
+			oid = orderResponse.ID
 			Expect(statusCode).Should(Equal(200))
 		})
 	})

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+//PaymentSourceResponse payment source api response struct
 type PaymentSourceResponse struct {
 	ID        string  `json:"id,omitempty"`
 	Object    string  `json:"object,omitempty"`
@@ -20,6 +21,7 @@ type PaymentSourceResponse struct {
 	Deleted   bool    `json:"deleted,omitempty"`
 }
 
+//PaymentSource payment source struct
 type PaymentSource struct {
 	ID        string  `json:"id,omitempty"`
 	Object    string  `json:"object,omitempty"`
@@ -35,6 +37,7 @@ type PaymentSource struct {
 	Address   Address `json:"address,omitempty"`
 }
 
+//PaymentSources payment sources struct
 type PaymentSources struct {
 	Object  string                   `json:"object,omitempty"`
 	HasMore *bool                    `json:"has_more,omitempty"`
@@ -42,7 +45,8 @@ type PaymentSources struct {
 	Data    []*PaymentSourceResponse `json:"data,omitempty"`
 }
 
-func (ps *PaymentSources) FindPaymentSources(customerID string) (statusCode int, conektaError ConektaError) {
+//FindPaymentSources gets a customer's payment sources
+func (ps *PaymentSources) FindPaymentSources(customerID string) (statusCode int, conektaError Error) {
 	statusCode, response := request("GET", "/customers/"+customerID+"/payment_sources", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -54,7 +58,8 @@ func (ps *PaymentSources) FindPaymentSources(customerID string) (statusCode int,
 	return
 }
 
-func (psr *PaymentSourceResponse) CreatePaymentSource(ps *PaymentSource) (statusCode int, conektaError ConektaError) {
+//CreatePaymentSource makes request to create payment source
+func (psr *PaymentSourceResponse) CreatePaymentSource(ps *PaymentSource) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/customers/"+ps.ParentID+"/payment_sources/", ps)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
@@ -66,7 +71,8 @@ func (psr *PaymentSourceResponse) CreatePaymentSource(ps *PaymentSource) (status
 	return
 }
 
-func (psr *PaymentSourceResponse) DeletePaymentSource(customerID string, paymentSourceID string) (statusCode int, conektaError ConektaError) {
+//DeletePaymentSource makes request to delete payment source
+func (psr *PaymentSourceResponse) DeletePaymentSource(customerID string, paymentSourceID string) (statusCode int, conektaError Error) {
 	statusCode, response := request("DELETE", "/customers/"+customerID+"/payment_sources/"+paymentSourceID, nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)

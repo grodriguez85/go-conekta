@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+//ChargeResponse charges api response struct
 type ChargeResponse struct {
 	ID                  string        `json:"id,omitempty"`
 	Object              string        `json:"object,omitempty"`
@@ -24,6 +25,7 @@ type ChargeResponse struct {
 	PaymentMethod       PaymentMethod `json:"payment_method,omitempty"`
 }
 
+//Charge charge struct
 type Charge struct {
 	ID                  string        `json:"id,omitempty"`
 	Object              string        `json:"object,omitempty"`
@@ -44,6 +46,7 @@ type Charge struct {
 	PaymentMethod       PaymentMethod `json:"payment_method,omitempty"`
 }
 
+//Charges charges struct
 type Charges struct {
 	Object  string           `json:"object,omitempty"`
 	HasMore *bool            `json:"has_more,omitempty"`
@@ -51,7 +54,8 @@ type Charges struct {
 	Data    []ChargeResponse `json:"data,omitempty"`
 }
 
-func (cr *ChargeResponse) CreateCharge(c *Charge) (statusCode int, conektaError ConektaError) {
+//CreateCharge makes request to create charge
+func (cr *ChargeResponse) CreateCharge(c *Charge) (statusCode int, conektaError Error) {
 	statusCode, response := request("POST", "/orders/"+c.OrderID+"/charges/", c)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
