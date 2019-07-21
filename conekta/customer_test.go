@@ -34,8 +34,9 @@ var _ = Describe("Creating customer", func() {
 		}
 		customer.PaymentSources = append(customer.PaymentSources, payment)
 		//Send to conekta
-		statusCode, _, response := customer.Create()
-		cusid = response.ID
+		customerResponse := new(conekta.CustomerResponse)
+		statusCode, _ := customerResponse.Create(customer)
+		cusid = customerResponse.ID
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -44,11 +45,12 @@ var _ = Describe("Creating customer", func() {
 	Context("Update a customer", func() {
 		//New customer
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
+		customer.ID = cusid
 		customer.Name = "Zutano Pérez"
 		customer.Email = "zutano@conekta.com"
 		customer.Phone = "+52181818181"
-		statusCode, _, _ := customer.Update()
+		customerResponse := new(conekta.CustomerResponse)
+		statusCode, _ := customerResponse.Update(customer)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -56,8 +58,9 @@ var _ = Describe("Creating customer", func() {
 
 	Context("Create a subscription", func() {
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.CreateSubscription("399")
+		customer.ID = cusid
+		subscriptionResponse := new(conekta.SubscriptionResponse)
+		statusCode, _ := subscriptionResponse.CreateSubscription(customer, "399")
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -65,8 +68,9 @@ var _ = Describe("Creating customer", func() {
 
 	Context("Update a subscription", func() {
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.UpdateSubscription("400")
+		customer.ID = cusid
+		subscriptionResponse := new(conekta.SubscriptionResponse)
+		statusCode, _, _ := subscriptionResponse.UpdateSubscription(customer, "400")
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -74,8 +78,9 @@ var _ = Describe("Creating customer", func() {
 
 	Context("Pause a subscription", func() {
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.PauseSubscription()
+		customer.ID = cusid
+		subscriptionResponse := new(conekta.SubscriptionResponse)
+		statusCode, _, _ := subscriptionResponse.PauseSubscription(customer)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -83,8 +88,9 @@ var _ = Describe("Creating customer", func() {
 
 	Context("Resume a subscription", func() {
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.ResumeSubscription()
+		customer.ID = cusid
+		subscriptionResponse := new(conekta.SubscriptionResponse)
+		statusCode, _, _ := subscriptionResponse.ResumeSubscription(customer)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
@@ -92,39 +98,37 @@ var _ = Describe("Creating customer", func() {
 
 	Context("Cancel a subscription", func() {
 		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.CancelSubscription()
+		customer.ID = cusid
+		subscriptionResponse := new(conekta.SubscriptionResponse)
+		statusCode, _, _ := subscriptionResponse.CancelSubscription(customer)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
 
 	Context("Create a payment source", func() {
-		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, paymentSource := customer.CreatePaymentSource(conekta.PaymentSource{
-			Type:    "card",
-			TokenID: "tok_test_mastercard_4444",
+		paymentSourceResponse := new(conekta.PaymentSourceResponse)
+		statusCode, _ := paymentSourceResponse.CreatePaymentSource(&conekta.PaymentSource{
+			Type:     "card",
+			TokenID:  "tok_test_mastercard_4444",
+			ParentID: cusid,
 		})
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
-		paysrc = paymentSource.ID
 	})
 
 	Context("Delete a payment source", func() {
-		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.DeletePaymentSource(paysrc)
+		paymentSourceResponse := new(conekta.PaymentSourceResponse)
+		statusCode, _ := paymentSourceResponse.DeletePaymentSource(cusid, paysrc)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
 	})
 
 	Context("Delete a customer", func() {
-		customer := new(conekta.Customer)
-		customer.CustomerID = cusid
-		statusCode, _, _ := customer.Delete()
+		customerResponse := new(conekta.CustomerResponse)
+		statusCode, _ := customerResponse.Delete(cusid)
 		It("Should response 200", func() {
 			Expect(statusCode).Should(Equal(200))
 		})
