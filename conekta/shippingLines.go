@@ -4,7 +4,7 @@ package conekta
 type ShippingLine struct {
 	ID             string   `json:"id,omitempty"`
 	Object         string   `json:"object,omitempty"`
-	Amount         float64  `json:"amount,omitempty"`
+	Amount         *int64   `json:"amount,omitempty"`
 	TrackingNumber string   `json:"tracking_number,omitempty"`
 	Carrier        string   `json:"carrier,omitempty"`
 	Method         string   `json:"method,omitempty"`
