@@ -6,19 +6,20 @@ import (
 
 //CustomerResponse customers api response struct
 type CustomerResponse struct {
-	ID               string         `json:"id,omitempty"`
-	Name                     string         `json:"name,omitempty"`
-	Phone                    string         `json:"phone,omitempty"`
-	Email                    string         `json:"email,omitempty"`
-	Corporate                bool           `json:"corporate,omitempty"`
-	DefaultPaymentSourceID   string         `json:"default_payment_source_id,omitempty"`
-	DefaultShippingContactID string         `json:"default_shipping_contact_id,omitempty"`
-	PaymentSources           PaymentSources `json:"payment_sources,omitempty"`
+	ID                       string               `json:"id,omitempty"`
+	Name                     string               `json:"name,omitempty"`
+	Phone                    string               `json:"phone,omitempty"`
+	Email                    string               `json:"email,omitempty"`
+	Corporate                bool                 `json:"corporate,omitempty"`
+	DefaultPaymentSourceID   string               `json:"default_payment_source_id,omitempty"`
+	DefaultShippingContactID string               `json:"default_shipping_contact_id,omitempty"`
+	PaymentSources           PaymentSources       `json:"payment_sources,omitempty"`
+	Subscription             SubscriptionResponse `json:"subscription,omitempty"`
 }
 
 //Customer customer struct
 type Customer struct {
-	ID               string            `json:"id,omitempty"`
+	ID                       string            `json:"id,omitempty"`
 	Name                     string            `json:"name,omitempty"`
 	Phone                    string            `json:"phone,omitempty"`
 	Email                    string            `json:"email,omitempty"`

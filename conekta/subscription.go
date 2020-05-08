@@ -17,6 +17,7 @@ type SubscriptionResponse struct {
 	TrialEnd          int64  `json:"trial_end,omitempty"`
 	PlanID            string `json:"plan_id,omitempty"`
 	Status            string `json:"status,omitempty"`
+	CustomerID        string `json:"customer_id,omitempty"`
 }
 
 //Subscription subscription struct
@@ -34,9 +35,39 @@ type Subscription struct {
 	Status            string `json:"status,omitempty"`
 }
 
+type SubscriptionRequestBody struct {
+	Plan            string `json:"plan,omitempty"`
+	CustomerID      string `json:"customer_id,omitempty"`
+	PaymentSourceID string `json:"card,omitempty"`
+}
+
+//SubscriptionWebhook struct for webhooks payload
+type SubscriptionWebhook struct {
+	Data SubscriptionWebhookData `json:"data,omitempty"`
+	Type string                  `json:"type,omitempty"`
+}
+
+type SubscriptionWebhookData struct {
+	Subscription SubscriptionResponse `json:"object,omitempty"`
+}
+
 //CreateSubscription makes request to create subscription
-func (sr *SubscriptionResponse) CreateSubscription(c *Customer, plan string) (statusCode int, conektaError Error) {
-	statusCode, response := request("POST", "/customers/"+c.ID+"/subscription", body{"plan": plan})
+func (sr *SubscriptionResponse) CreateSubscription(conektaID string, plan string, paymentSourceID interface{}) (statusCode int, conektaError Error) {
+
+	body := SubscriptionRequestBody{
+		Plan:       plan,
+		CustomerID: conektaID,
+	}
+
+	if paymentSourceID != nil {
+		body.PaymentSourceID = paymentSourceID.(string)
+	}
+
+	statusCode, response := request(
+		"POST",
+		"/customers/"+conektaID+"/subscription",
+		body,
+	)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -48,8 +79,14 @@ func (sr *SubscriptionResponse) CreateSubscription(c *Customer, plan string) (st
 }
 
 //UpdateSubscription makes request to update subscription
-func (sr *SubscriptionResponse) UpdateSubscription(c *Customer, plan string) (statusCode int, conektaError Error, subscription Subscription) {
-	statusCode, response := request("PUT", "/customers/"+c.ID+"/subscription", body{"plan": plan})
+func (sr *SubscriptionResponse) UpdateSubscription(conektaID string, plan string) (statusCode int, conektaError Error) {
+
+	body := SubscriptionRequestBody{
+		Plan:       plan,
+		CustomerID: conektaID,
+	}
+
+	statusCode, response := request("PUT", "/customers/"+conektaID+"/subscription", body)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -61,8 +98,8 @@ func (sr *SubscriptionResponse) UpdateSubscription(c *Customer, plan string) (st
 }
 
 //PauseSubscription makes request to pause subscription
-func (sr *SubscriptionResponse) PauseSubscription(c *Customer) (statusCode int, conektaError Error, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.ID+"/subscription/pause", nil)
+func (sr *SubscriptionResponse) PauseSubscription(conektaID string) (statusCode int, conektaError Error) {
+	statusCode, response := request("POST", "/customers/"+conektaID+"/subscription/pause", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -74,8 +111,8 @@ func (sr *SubscriptionResponse) PauseSubscription(c *Customer) (statusCode int, 
 }
 
 //ResumeSubscription makes request to resume subscription
-func (sr *SubscriptionResponse) ResumeSubscription(c *Customer) (statusCode int, conektaError Error, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.ID+"/subscription/resume", nil)
+func (sr *SubscriptionResponse) ResumeSubscription(conektaID string) (statusCode int, conektaError Error) {
+	statusCode, response := request("POST", "/customers/"+conektaID+"/subscription/resume", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
@@ -87,8 +124,8 @@ func (sr *SubscriptionResponse) ResumeSubscription(c *Customer) (statusCode int,
 }
 
 //CancelSubscription makes request to cancel subscription
-func (sr *SubscriptionResponse) CancelSubscription(c *Customer) (statusCode int, conektaError Error, subscription Subscription) {
-	statusCode, response := request("POST", "/customers/"+c.ID+"/subscription/cancel", nil)
+func (sr *SubscriptionResponse) CancelSubscription(conektaID string) (statusCode int, conektaError Error) {
+	statusCode, response := request("POST", "/customers/"+conektaID+"/subscription/cancel", nil)
 	if statusCode != 200 {
 		err := json.Unmarshal(response, &conektaError)
 		checkError(err)
